@@ -8,20 +8,24 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
+import android.util.Log;
 import android.media.MediaPlayer;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
-public class AudioService extends Service{
+public class AudioService extends Service {
+    private static final String TAG = "AudioService";
     public static final String CHANNEL_ID = "AudioServiceChannel";
     private MediaPlayer mediaPlayer;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        Log.d(TAG, "Service created");
         mediaPlayer = MediaPlayer.create(this, R.raw.sample_audio); // Add your audio file in res/raw folder
         mediaPlayer.setLooping(true);
+        Log.d(TAG, "MediaPlayer created and looping set");
     }
 
     @Override
@@ -40,7 +44,12 @@ public class AudioService extends Service{
 
         startForeground(1, notification);
 
-        mediaPlayer.start();
+        if (mediaPlayer != null) {
+            mediaPlayer.start();
+            Log.d(TAG, "MediaPlayer started");
+        } else {
+            Log.e(TAG, "MediaPlayer is null");
+        }
 
         return START_STICKY;
     }
@@ -48,8 +57,11 @@ public class AudioService extends Service{
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mediaPlayer.stop();
-        mediaPlayer.release();
+        if (mediaPlayer != null) {
+            mediaPlayer.stop();
+            mediaPlayer.release();
+            Log.d(TAG, "MediaPlayer stopped and released");
+        }
     }
 
     private void createNotificationChannel() {
@@ -62,6 +74,9 @@ public class AudioService extends Service{
             NotificationManager manager = getSystemService(NotificationManager.class);
             if (manager != null) {
                 manager.createNotificationChannel(serviceChannel);
+                Log.d(TAG, "Notification channel created");
+            } else {
+                Log.e(TAG, "NotificationManager is null");
             }
         }
     }
