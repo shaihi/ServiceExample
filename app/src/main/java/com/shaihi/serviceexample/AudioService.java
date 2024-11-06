@@ -23,7 +23,7 @@ public class AudioService extends Service {
     public void onCreate() {
         super.onCreate();
         Log.d(TAG, "Service created");
-        mediaPlayer = MediaPlayer.create(this, R.raw.sample_audio); // Add your audio file in res/raw folder
+        mediaPlayer = MediaPlayer.create(this, R.raw.lonely_cat); // Add your audio file in res/raw folder
         mediaPlayer.setLooping(true);
         Log.d(TAG, "MediaPlayer created and looping set");
     }
@@ -45,10 +45,13 @@ public class AudioService extends Service {
         startForeground(1, notification);
 
         if (mediaPlayer != null) {
-            mediaPlayer.start();
-            Log.d(TAG, "MediaPlayer started");
+            mediaPlayer.setLooping(true);
+            mediaPlayer.setOnPreparedListener(mp -> {
+                Log.d(TAG, "MediaPlayer is prepared and ready to start");
+                mediaPlayer.start();
+            });
         } else {
-            Log.e(TAG, "MediaPlayer is null");
+            Log.e(TAG, "MediaPlayer creation failed");
         }
 
         return START_STICKY;
